@@ -38,6 +38,9 @@
 #endif
 
 #ifdef _MSC_VER
+#pragma function (ceil)
+#pragma function (floor)
+
 #include <WinSock2.h>
 
 // From: https://stackoverflow.com/a/26085827
@@ -1612,8 +1615,7 @@ static inline BOOL js_check_stack_overflow(JSRuntime *rt, size_t alloca_size)
 static inline uint8_t *js_get_stack_pointer(void)
 {
 #ifdef _MSC_VER
-    uint8_t ptr;
-    return &ptr;
+    return _AddressOfReturnAddress();
 #else
     return __builtin_frame_address(0);
 #endif
