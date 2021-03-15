@@ -61,6 +61,15 @@ typedef struct JSObject JSObject;
 typedef struct JSClass JSClass;
 typedef uint32_t JSClassID;
 typedef uint32_t JSAtom;
+typedef struct JSParseState JSParseState;
+
+JSParseState *JS_ParseInit(JSContext *ctx, const char *input, size_t input_len);
+int JS_ParseNextToken(JSParseState *s);
+int JS_ParseTemplatePart(JSParseState *s);
+const uint8_t *JS_GetParseStateTokenPtr(JSParseState *s);
+const uint8_t *JS_GetParseStateBufPtr(JSParseState *s);
+void JS_ParseEnd(JSContext *ctx, JSParseState *s);
+void JS_SetParseStateBufPtr(JSParseState *s, const uint8_t *ptr);
 
 #if INTPTR_MAX >= INT64_MAX
 #define JS_PTR64

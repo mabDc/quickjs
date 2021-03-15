@@ -53860,3 +53860,53 @@ void JS_AddIntrinsicTypedArrays(JSContext *ctx)
     JS_AddIntrinsicAtomics(ctx);
 #endif
 }
+
+JSParseState *JS_ParseInit(JSContext *ctx, const char *input, size_t input_len) {
+    JSParseState *s = (JSParseState *)js_malloc(ctx, sizeof(JSParseState));
+    js_parse_init(ctx, s, input, input_len, "<dump_token>");
+    return s;
+}
+
+int JS_ParseNextToken(JSParseState *s) {
+    next_token(s);
+    if(s->token.val == TOK_TEMPLATE && s->token.u.str.sep == '`')
+        return TOK_STRING;
+    return s->token.val;
+}
+
+int JS_ParseTemplatePart(JSParseState *s) {
+    return js_parse_template_part(s, s->buf_ptr);
+}
+
+const uint8_t *JS_GetParseStateTokenPtr(JSParseState *s) {
+    return s->token.ptr;
+}
+
+void JS_SetParseStateBufPtr(JSParseState *s, const uint8_t *ptr) {
+    s->buf_ptr = ptr;
+}
+
+const uint8_t *JS_GetParseStateBufPtr(JSParseState *s) {
+    return s->buf_ptr;
+}
+
+void JS_ParseEnd(JSContext *ctx, JSParseState *s) {
+    free_token(s, &s->token);
+    js_free(ctx, s);
+}
+
+// void JS_DumpToken(JSContext *ctx, const char *input, size_t input_len) {
+//     JSParseState sp, *s = &sp;
+//     js_parse_init(ctx, s, input, input_len, "<dump_token>");
+//     do {
+//         if(next_token(s)) {
+//             s->buf_ptr++;
+//         }
+//         if(s->token.val == TOK_TEMPLATE && s->token.u.str.sep != '`') {
+//             js_parse_template_part(s, s->buf_ptr);
+//         }
+//         printf("%d-%d ", s->token.ptr - input, s->buf_ptr - input);
+//         dump_token(s, &s->token);
+//     } while(s->token.val != TOK_EOF);
+//     free_token(s, &s->token);
+// }
